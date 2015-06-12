@@ -1,0 +1,58 @@
+﻿@Master['master.sshtml']
+
+@Section['Content']
+	<ul class="collection with-header">
+		<li class="collection-header"><h4>Available services</h4></li>
+		@Each.Services
+			<li class="collection-item">
+				<div>
+					@Current.Name
+					@If.Running
+						<a href="#!" class="secondary-content" data-name="@Current.Name" data-action="stop">
+							<i class="red-text mdi-av-stop"></i>
+						</a>
+					@EndIf
+
+					@IfNot.Running
+						<a href="#!" class="secondary-content" data-name="@Current.Name" data-action="start">
+							<i class="green-text mdi-av-play-arrow"></i>
+						</a>
+					@EndIf
+					<br />
+					<small>@Current.AssemblyPath</small>
+				</div>
+			</li>
+		@EndEach
+	</ul>
+@EndSection
+
+@Section['Scripts']
+	<script type="text/javascript">
+		$(function() {
+			$('a.secondary-content').on('click', function(e) {
+				var name = e.currentTarget.getAttribute('data-name');
+				var action = e.currentTarget.getAttribute('data-action');
+				var $this = $(this);
+
+				$.ajax('service/' + name, { type: (action === 'start' ? 'POST' : 'DELETE') })
+				.done(function() {
+					if (action === 'start') {
+						$('i', $this)
+							.removeClass('mdi-av-play-arrow').addClass('mdi-av-stop')
+							.removeClass('green-text').addClass('red-text');
+
+						$this.attr('data-action', 'stop');
+					}
+
+					if (action === 'stop') {
+						$('i', $this)
+							.removeClass('mdi-av-stop').addClass('mdi-av-play-arrow')
+							.removeClass('red-text').addClass('green-text');
+
+						$this.attr('data-action', 'start');
+					}
+				});
+			});
+		});
+	</script>
+@EndSection
